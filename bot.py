@@ -1,18 +1,30 @@
 import discord
 import os
+import aiohttp
 from dotenv import load_dotenv
 from groq import AsyncGroq
 
 load_dotenv()
 
+# --- PROXY CONFIGURATION ---
+# Format expected: http://username:password@ip:port
+proxy_url = os.getenv("PROXY_URL")
+
+class ProxiedClient(discord.Client):
+    async def setup_hook(self):
+        # This tells the bot to use the proxy for all Discord API calls
+        if proxy_url:
+            self.http.proxy = proxy_url
+            print(f"✅ Routing traffic through proxy: {proxy_url.split('@')[-1]}")
+
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+# Using our custom ProxiedClient instead of the standard discord.Client
+client = ProxiedClient(intents=intents)
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-# Store conversation history per user
-conversation_history = {}  # user_id: list of messages
+conversation_history = {}
 
 system_prompt = """You are a fun, chill, and witty Discord buddy. 
 You hold normal, friendly conversations by default. You're helpful, sarcastic when it fits, and enjoy bantering.
@@ -46,14 +58,12 @@ async def on_message(message):
 
         user_id = str(message.author.id)
         
-        # Initialize history for new user
         if user_id not in conversation_history:
             conversation_history[user_id] = []
 
-        # Build message list
         messages = [
             {"role": "system", "content": system_prompt}
-        ] + conversation_history[user_id][-10:] + [  # Keep last 10 messages
+        ] + conversation_history[user_id][-10:] + [
             {"role": "user", "content": query}
         ]
 
@@ -71,7 +81,6 @@ async def on_message(message):
                 
                 reply = response.choices[0].message.content.strip()
                 
-                # Save to history
                 conversation_history[user_id].append({"role": "user", "content": query})
                 conversation_history[user_id].append({"role": "assistant", "content": reply})
                 
