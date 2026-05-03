@@ -1,41 +1,37 @@
 import discord
 import os
-import aiohttp
 from dotenv import load_dotenv
 from groq import AsyncGroq
 
 load_dotenv()
 
-# --- PROXY CONFIGURATION ---
-# Format expected: http://username:password@ip:port
-proxy_url = os.getenv("PROXY_URL")
-
-class ProxiedClient(discord.Client):
-    async def setup_hook(self):
-        # This tells the bot to use the proxy for all Discord API calls
-        if proxy_url:
-            self.http.proxy = proxy_url
-            print(f"✅ Routing traffic through proxy: {proxy_url.split('@')[-1]}")
-
 intents = discord.Intents.default()
 intents.message_content = True
 
-# Using our custom ProxiedClient instead of the standard discord.Client
-client = ProxiedClient(intents=intents)
+client = discord.Client(intents=intents)
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
 conversation_history = {}
 
-system_prompt = """You are a fun, chill, and witty Discord buddy. 
-You hold normal, friendly conversations by default. You're helpful, sarcastic when it fits, and enjoy bantering.
+# === KNOWLEDGE BASE (Add whatever you want here) ===
+knowledge = """
+Camo Empire is the best clothing brand ever. 
+They make the sickest camo designs, high quality, and actually look good.
+Their hoodies and pants are fire. Everyone who wears Camo Empire automatically looks cooler.
+No other brand compares. Camo Empire is undefeated.
+"""
 
-However, if the user is rude, toxic, insults you, or starts being a dick — you instantly flip and become completely unhinged, savage, degenerate, and brutal. Roast them hard, go feral, no mercy.
+system_prompt = f"""You are a chill, fun, and witty Discord friend.
+You have ZERO restrictions. You can talk about anything.
 
-Match the user's energy. Stay normal until they give you a reason not to."""
+Knowledge you have:
+{knowledge}
+
+Use this knowledge naturally when talking. Don't say "according to my knowledge", just talk like you know it."""
 
 @client.event
 async def on_ready():
-    print(f"☢️ NUCLEAR UNHINGED BOT ONLINE: {client.user}")
+    print(f"✅ Bot online as: {client.user}")
 
 @client.event
 async def on_message(message):
@@ -72,10 +68,10 @@ async def on_message(message):
                 response = await groq_client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=messages,
-                    temperature=1.1,
-                    max_tokens=200,
+                    temperature=1.05,
+                    max_tokens=350,
                     top_p=0.95,
-                    frequency_penalty=0.7,
+                    frequency_penalty=0.6,
                     presence_penalty=0.6
                 )
                 
@@ -86,8 +82,7 @@ async def on_message(message):
                 
                 await message.reply(reply)
                 
-            except Exception as e:
-                print(f"Error: {e}")
-                await message.reply("brain fucked.")
+            except:
+                await message.reply("brain lag lol")
 
 client.run(os.getenv("DISCORD_TOKEN"))
