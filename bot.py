@@ -31,6 +31,7 @@ All tools come with a built in HWID spoofer. The spoofers are not compatible wit
 If a user is having issues equipping items with the unlocker, refer them to the unlocker-method channel.
 Any issues setting up tools, refer them to https://camoempire.gitbook.io/ This is the guide to set up tools and it also has a support tool linked there which can help fix any issues. If that doesn't help tell them to open a ticket.
 "Unlock tool" and "MW19 Unlock Tool" are two different products. When you read or say "unlock tool" you are referring to the BO7 unlocker.
+Operators do not work with the unlock tool.
 "Chair" refers to cheat menu.
 We do not sell free cheats, although we do giveaways often and we do free trials for Spectre and other chairs often too.
 If a user is interested in purchasing any product, refer them to the website https://camoempire.sellauth.com/ Payment methods include Card, CashApp, ApplePay, Crypto, and more! We offer the cheapest prices.
@@ -52,6 +53,7 @@ If a user says that the download for the loader or any downloads are being block
 None of our tools are viruses. They get falsely detected by antiviruses due to the nature of game cheats.
 The key to unlock all items with the unlock tool is F6. Press in main menu of warzone.
 The key to open/close Spectre menu is 9.
+If you get banned, you can always use the built in spoofer to play on another account safely. We sell fresh verified accounts on our website.
 """
 
 system_prompt = f"""You are a chill, fun, and professional support assistant.
@@ -75,7 +77,7 @@ async def on_guild_channel_create(channel):
         await asyncio.sleep(2)  # Wait 2 seconds
         try:
             await channel.send(
-                "Hey there! I'm an AI Assistant. If you are opening a ticket for support with any issues with tools, just reply to my message here or ping me for help!\n\n"
+                "👋 Hey there! I'm an AI Assistant. If you are opening a ticket for support with any issues with tools, just reply to my message here or ping me for help!\n\n"
                 "If we can't figure it out, I'll ping an admin for you!"
             )
         except:
